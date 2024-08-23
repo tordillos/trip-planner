@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+      "biomejs.biome",
+      "expo.vscode-expo-tools",
+      "streetsidesoftware.code-spell-checker",
+      "yoavbls.pretty-ts-errors"
+    ]
+  }
