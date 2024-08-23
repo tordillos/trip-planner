@@ -3,6 +3,7 @@ import { Image, StyleSheet } from "react-native";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Sun } from "@/lib/icons/Sun";
 import { Text } from "@/components/ui/text";
+import { Button } from "@/components/ui/button";
 
 export default function HomeScreen() {
   return (
@@ -17,6 +18,9 @@ export default function HomeScreen() {
     >
       <Text className="text-2xl">Welcome to Expo!</Text>
       <Sun />
+      <Button>
+        <Text>Hello World Button</Text>
+      </Button>
     </ParallaxScrollView>
   );
 }
