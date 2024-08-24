@@ -42,6 +42,11 @@ module.exports = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      fontFamily: {
+        outfit: "outfit",
+        "outfit-medium": "outfit-medium",
+        "outfit-bold": "outfit-bold",
+      },
       borderWidth: {
         hairline: hairlineWidth(),
       },

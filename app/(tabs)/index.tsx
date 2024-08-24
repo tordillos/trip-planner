@@ -1,45 +1,24 @@
-import { Image, StyleSheet } from "react-native";
+import { View } from "react-native";
 
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { Sun } from "@/lib/icons/Sun";
-import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
+import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
+  
+  const insets = useSafeAreaInsets();
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <Text className="text-2xl">Welcome to Expo!</Text>
-      <Sun />
-      <Button>
-        <Text>Hello World Button</Text>
-      </Button>
-    </ParallaxScrollView>
+    <View style={{flex: 1, paddingTop: insets.top, paddingRight: insets.right, paddingLeft: insets.left, }}>
+      <View className="flex-1">
+        <Image source={require('../../assets/images/home-screen.jpg')} style={{width: '100%', height: '100%'}} />
+      </View>
+      <View className="flex-1 justify-end pb-36 rounded-t-3xl bg-background -mt-6 gap-8">
+        <Text className="text-5xl text-center">AI Trip Planner</Text>
+        <Text className="self-center w-80 text-justify ">Get personalized travel recommendations based on your style and budget. Find the perfect destination in just a few taps!</Text>
+        <Button className="self-center min-w-80" onPress={() => {}}><Text>Get Started</Text></Button>
+      </View>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-  },
-});
