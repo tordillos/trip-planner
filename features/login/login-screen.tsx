@@ -6,7 +6,15 @@ import { useSignIn } from "@clerk/clerk-expo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
-import { Alert, ScrollView, View } from "react-native";
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as z from "zod";
 import { AuthGoogle } from "./auth-google";
@@ -58,65 +66,74 @@ export function LoginScreen() {
   };
 
   return (
-    <ScrollView
-      style={{
-        paddingTop: insets.top,
-        paddingRight: insets.right,
-        paddingBottom: insets.bottom,
-        paddingLeft: insets.left,
-      }}
-      className="flex-1"
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
-      <Form {...form}>
-        <View className="gap-4 flex-1 justify-center mx-4 h-screen">
-          <Text className="text-2xl">Welcome 👋</Text>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormInput
-                label="Email"
-                placeholder="hello@zachnugent.ca"
-                autoCapitalize="none"
-                autoComplete="email"
-                {...field}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          style={{
+            paddingTop: insets.top,
+            paddingRight: insets.right,
+            paddingBottom: insets.bottom,
+            paddingLeft: insets.left,
+          }}
+          className="flex-1"
+        >
+          <Form {...form}>
+            <View className="gap-4 flex-1 justify-center mx-4 h-screen">
+              <Text className="text-2xl">Welcome 👋</Text>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormInput
+                    label="Email"
+                    placeholder="hello@zachnugent.ca"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    {...field}
+                  />
+                )}
               />
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormInput
-                label="Password"
-                placeholder="******"
-                autoCapitalize="none"
-                autoComplete="password"
-                secureTextEntry={true}
-                {...field}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormInput
+                    label="Password"
+                    placeholder="******"
+                    autoCapitalize="none"
+                    autoComplete="password"
+                    secureTextEntry={true}
+                    {...field}
+                  />
+                )}
               />
-            )}
-          />
-          <Link href="/(login)/change-password" asChild>
-            <Text className="text-right text-primary">Forgot Password?</Text>
-          </Link>
-          <Button className="mt-4" onPress={form.handleSubmit(onSubmit)}>
-            <Text>Sign In</Text>
-          </Button>
-          <View className="flex flex-row justify-center items-center mt-4 gap-3">
-            <View className="flex-1 h-[1px] bg-primary/30" />
-            <Text className="text-lg text-primary">Or</Text>
-            <View className="flex-1 h-[1px] bg-primary/30" />
-          </View>
-          <AuthGoogle />
-          <Link href="/(login)/sign-up" asChild>
-            <Text className="text-center mt-4 text-primary/60">
-              You don't have an account?{" "}
-              <Text className="text-primary">Register</Text>
-            </Text>
-          </Link>
-        </View>
-      </Form>
-    </ScrollView>
+              <Link href="/(login)/change-password" asChild>
+                <Text className="text-right text-primary">
+                  Forgot Password?
+                </Text>
+              </Link>
+              <Button className="mt-4" onPress={form.handleSubmit(onSubmit)}>
+                <Text>Sign In</Text>
+              </Button>
+              <View className="flex flex-row justify-center items-center mt-4 gap-3">
+                <View className="flex-1 h-[1px] bg-primary/30" />
+                <Text className="text-lg text-primary">Or</Text>
+                <View className="flex-1 h-[1px] bg-primary/30" />
+              </View>
+              <AuthGoogle />
+              <Link href="/(login)/sign-up" asChild>
+                <Text className="text-center mt-4 text-primary/60">
+                  You don't have an account?{" "}
+                  <Text className="text-primary">Register</Text>
+                </Text>
+              </Link>
+            </View>
+          </Form>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }

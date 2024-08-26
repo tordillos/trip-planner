@@ -7,7 +7,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Alert, ScrollView, View } from "react-native";
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import ReactNativeModal from "react-native-modal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as z from "zod";
@@ -92,7 +100,6 @@ export function ChangePasswordScreen() {
         password: data.password,
       });
 
-      console.log(completeSignUp);
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
         router.replace("/(root)/explore");
@@ -114,93 +121,107 @@ export function ChangePasswordScreen() {
   };
 
   return (
-    <ScrollView
-      style={{
-        paddingTop: insets.top,
-        paddingRight: insets.right,
-        paddingBottom: insets.bottom,
-        paddingLeft: insets.left,
-      }}
-      className="flex-1"
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
-      <Form {...form}>
-        <View className="gap-4 flex-1 justify-center mx-4 h-screen">
-          <Text className="text-2xl">Reset your password 🔐</Text>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormInput
-                label="Email"
-                placeholder="hello@zachnugent.ca"
-                autoCapitalize="none"
-                autoComplete="email"
-                {...field}
-              />
-            )}
-          />
-          <Button className="mt-4" onPress={form.handleSubmit(onSubmit)}>
-            <Text>Send mail</Text>
-          </Button>
-          <Link href="/(login)/login" asChild>
-            <Text className="text-center mt-4 text-primary/60">
-              You remember the password?{" "}
-              <Text className="text-primary">Login</Text>
-            </Text>
-          </Link>
-        </View>
-      </Form>
-      <ReactNativeModal
-        isVisible={verification.state === "pending"}
-        onBackdropPress={() => {
-          formCode.reset();
-          form.reset();
-          setVerification({ ...verification, state: "default" });
-        }}
-        onModalHide={() => {
-          if (verification.state === "success") {
-            router.replace("/(root)/explore");
-          }
-        }}
-      >
-        <View className="bg-background px-7 py-9 rounded-2xl min-h-72">
-          <Text className="text-2xl mb-2">Verification</Text>
-          <Text className="mb-5">
-            We've sent a verification code to {form.getValues("email")}.
-          </Text>
-          <Form {...formCode}>
-            <View className="gap-8">
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          style={{
+            paddingTop: insets.top,
+            paddingRight: insets.right,
+            paddingBottom: insets.bottom,
+            paddingLeft: insets.left,
+          }}
+          className="flex-1"
+        >
+          <Form {...form}>
+            <View className="gap-4 flex-1 justify-center mx-4 h-screen">
+              <Text className="text-2xl">Reset your password 🔐</Text>
               <FormField
-                control={formCode.control}
-                name="code"
-                render={({ field }) => (
-                  <FormInput label="Code" autoCapitalize="none" {...field} />
-                )}
-              />
-              <FormField
-                control={formCode.control}
-                name="password"
+                control={form.control}
+                name="email"
                 render={({ field }) => (
                   <FormInput
-                    label="New Password"
-                    placeholder="**********"
+                    label="Email"
+                    placeholder="hello@zachnugent.ca"
                     autoCapitalize="none"
-                    autoComplete="password"
-                    secureTextEntry={true}
+                    autoComplete="email"
                     {...field}
                   />
                 )}
               />
-              {verification.error.length > 0 && (
-                <Text className="text-destructive">{verification.error}</Text>
-              )}
-              <Button onPress={formCode.handleSubmit(onVerify)}>
-                <Text>Change Password</Text>
+              <Button className="mt-4" onPress={form.handleSubmit(onSubmit)}>
+                <Text>Send mail</Text>
               </Button>
+              <Link href="/(login)/login" asChild>
+                <Text className="text-center mt-4 text-primary/60">
+                  You remember the password?{" "}
+                  <Text className="text-primary">Login</Text>
+                </Text>
+              </Link>
             </View>
           </Form>
-        </View>
-      </ReactNativeModal>
-    </ScrollView>
+          <ReactNativeModal
+            avoidKeyboard={true}
+            isVisible={verification.state === "pending"}
+            onBackdropPress={() => {
+              formCode.reset();
+              form.reset();
+              setVerification({ ...verification, state: "default" });
+            }}
+            onModalHide={() => {
+              if (verification.state === "success") {
+                router.replace("/(root)/explore");
+              }
+            }}
+          >
+            <View className="bg-background px-7 py-9 rounded-2xl min-h-72">
+              <Text className="text-2xl mb-2">Verification</Text>
+              <Text className="mb-5">
+                We've sent a verification code to {form.getValues("email")}.
+              </Text>
+              <Form {...formCode}>
+                <View className="gap-8">
+                  <FormField
+                    control={formCode.control}
+                    name="code"
+                    render={({ field }) => (
+                      <FormInput
+                        label="Code"
+                        autoCapitalize="none"
+                        {...field}
+                      />
+                    )}
+                  />
+                  <FormField
+                    control={formCode.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormInput
+                        label="New Password"
+                        placeholder="**********"
+                        autoCapitalize="none"
+                        autoComplete="password"
+                        secureTextEntry={true}
+                        {...field}
+                      />
+                    )}
+                  />
+                  {verification.error.length > 0 && (
+                    <Text className="text-destructive">
+                      {verification.error}
+                    </Text>
+                  )}
+                  <Button onPress={formCode.handleSubmit(onVerify)}>
+                    <Text>Change Password</Text>
+                  </Button>
+                </View>
+              </Form>
+            </View>
+          </ReactNativeModal>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }

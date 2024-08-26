@@ -7,7 +7,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Alert, ScrollView, View } from "react-native";
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { ReactNativeModal } from "react-native-modal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as z from "zod";
@@ -112,112 +120,122 @@ export function SignUpScreen() {
   };
 
   return (
-    <ScrollView
-      style={{
-        paddingTop: insets.top,
-        paddingRight: insets.right,
-        paddingBottom: insets.bottom,
-        paddingLeft: insets.left,
-      }}
-      className="flex-1"
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
-      <Form {...form}>
-        <View className="gap-4 flex-1 justify-center mx-4 h-screen">
-          <Text className="text-2xl">Create your account 🤙</Text>
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormInput
-                label="Name"
-                placeholder="Alex Doe"
-                autoCapitalize="none"
-                autoComplete="name"
-                {...field}
-              />
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormInput
-                label="Email"
-                placeholder="hello@zachnugent.ca"
-                autoCapitalize="none"
-                autoComplete="email"
-                {...field}
-              />
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormInput
-                label="Password"
-                placeholder="**********"
-                autoCapitalize="none"
-                autoComplete="password"
-                secureTextEntry={true}
-                {...field}
-              />
-            )}
-          />
-          <Button className="mt-4" onPress={form.handleSubmit(onSubmit)}>
-            <Text>Sign Up</Text>
-          </Button>
-          <View className="flex flex-row justify-center items-center mt-4 gap-3">
-            <View className="flex-1 h-[1px] bg-primary/30" />
-            <Text className="text-lg text-primary">Or</Text>
-            <View className="flex-1 h-[1px] bg-primary/30" />
-          </View>
-          <AuthGoogle />
-          <Link href="/(login)/login" asChild>
-            <Text className="text-center mt-4 text-primary/60">
-              Already have an account?{" "}
-              <Text className="text-primary">Login</Text>
-            </Text>
-          </Link>
-        </View>
-      </Form>
-      <ReactNativeModal
-        isVisible={verification.state === "pending"}
-        onBackdropPress={() => {
-          formCode.reset();
-          form.reset();
-          setVerification({ ...verification, state: "default" });
-        }}
-        onModalHide={() => {
-          if (verification.state === "success") {
-            router.replace("/(root)/explore");
-          }
-        }}
-      >
-        <View className="bg-background px-7 py-9 rounded-2xl min-h-72">
-          <Text className="text-2xl mb-2">Verification</Text>
-          <Text className="mb-5">
-            We've sent a verification code to {form.getValues("email")}.
-          </Text>
-          <Form {...formCode}>
-            <View className="gap-8">
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          style={{
+            paddingTop: insets.top,
+            paddingRight: insets.right,
+            paddingBottom: insets.bottom,
+            paddingLeft: insets.left,
+          }}
+          className="flex-1"
+        >
+          <Form {...form}>
+            <View className="gap-4 flex-1 justify-center mx-4 h-screen">
+              <Text className="text-2xl">Create your account 🤙</Text>
               <FormField
-                control={formCode.control}
-                name="code"
+                control={form.control}
+                name="name"
                 render={({ field }) => (
-                  <FormInput autoCapitalize="none" {...field} />
+                  <FormInput
+                    label="Name"
+                    placeholder="Alex Doe"
+                    autoCapitalize="none"
+                    autoComplete="name"
+                    {...field}
+                  />
                 )}
               />
-              {verification.error.length > 0 && (
-                <Text className="text-destructive">{verification.error}</Text>
-              )}
-              <Button onPress={formCode.handleSubmit(onVerify)}>
-                <Text>Verify Email</Text>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormInput
+                    label="Email"
+                    placeholder="hello@zachnugent.ca"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    {...field}
+                  />
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormInput
+                    label="Password"
+                    placeholder="**********"
+                    autoCapitalize="none"
+                    autoComplete="password"
+                    secureTextEntry={true}
+                    {...field}
+                  />
+                )}
+              />
+              <Button className="mt-4" onPress={form.handleSubmit(onSubmit)}>
+                <Text>Sign Up</Text>
               </Button>
+              <View className="flex flex-row justify-center items-center mt-4 gap-3">
+                <View className="flex-1 h-[1px] bg-primary/30" />
+                <Text className="text-lg text-primary">Or</Text>
+                <View className="flex-1 h-[1px] bg-primary/30" />
+              </View>
+              <AuthGoogle />
+              <Link href="/(login)/login" asChild>
+                <Text className="text-center mt-4 text-primary/60">
+                  Already have an account?{" "}
+                  <Text className="text-primary">Login</Text>
+                </Text>
+              </Link>
             </View>
           </Form>
-        </View>
-      </ReactNativeModal>
-    </ScrollView>
+          <ReactNativeModal
+            isVisible={verification.state === "pending"}
+            avoidKeyboard={true}
+            onBackdropPress={() => {
+              formCode.reset();
+              form.reset();
+              setVerification({ ...verification, state: "default" });
+            }}
+            onModalHide={() => {
+              if (verification.state === "success") {
+                router.replace("/(root)/explore");
+              }
+            }}
+          >
+            <View className="bg-background px-7 py-9 rounded-2xl min-h-72">
+              <Text className="text-2xl mb-2">Verification</Text>
+              <Text className="mb-5">
+                We've sent a verification code to {form.getValues("email")}.
+              </Text>
+              <Form {...formCode}>
+                <View className="gap-8">
+                  <FormField
+                    control={formCode.control}
+                    name="code"
+                    render={({ field }) => (
+                      <FormInput autoCapitalize="none" {...field} />
+                    )}
+                  />
+                  {verification.error.length > 0 && (
+                    <Text className="text-destructive">
+                      {verification.error}
+                    </Text>
+                  )}
+                  <Button onPress={formCode.handleSubmit(onVerify)}>
+                    <Text>Verify Email</Text>
+                  </Button>
+                </View>
+              </Form>
+            </View>
+          </ReactNativeModal>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
