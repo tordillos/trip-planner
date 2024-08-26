@@ -1,12 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormInput } from "@/components/ui/form";
 import { Text } from "@/components/ui/text";
+import type { ClerkError } from "@/types/types";
+import { useSignIn } from "@clerk/clerk-expo";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image } from "expo-image";
+import { Link, useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Alert, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as z from "zod";
+import { AuthGoogle } from "./auth-google";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -20,6 +23,9 @@ const formSchema = z.object({
 export function LoginScreen() {
   const insets = useSafeAreaInsets();
 
+  const { signIn, setActive, isLoaded } = useSignIn();
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -28,9 +34,29 @@ export function LoginScreen() {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    Alert.alert("Login", JSON.stringify(data));
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    if (!isLoaded) {
+      return;
+    }
+
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: data.email,
+        password: data.password,
+      });
+
+      if (signInAttempt.status === "complete") {
+        await setActive({ session: signInAttempt.createdSessionId });
+        router.replace("/");
+      } else {
+        Alert.alert("Error", "Log in failed. Please try again.");
+      }
+    } catch (err) {
+      const error = (err as ClerkError) || "An error occurred";
+      Alert.alert("Error", error.errors[0].longMessage);
+    }
   };
+
   return (
     <ScrollView
       style={{
@@ -66,6 +92,7 @@ export function LoginScreen() {
                 placeholder="******"
                 autoCapitalize="none"
                 autoComplete="password"
+                secureTextEntry={true}
                 {...field}
               />
             )}
@@ -73,20 +100,18 @@ export function LoginScreen() {
           <Button className="mt-4" onPress={form.handleSubmit(onSubmit)}>
             <Text>Sign In</Text>
           </Button>
-          <View className="flex flex-row justify-center items-center mt-4 gap-x-3">
+          <View className="flex flex-row justify-center items-center mt-4 gap-3">
             <View className="flex-1 h-[1px] bg-primary/30" />
             <Text className="text-lg text-primary">Or</Text>
             <View className="flex-1 h-[1px] bg-primary/30" />
           </View>
-          <Button variant="secondary" className="mt-4">
-            <View className="flex-row gap-4 align-middle">
-              <Image
-                source={require("../../assets/images/google.png")}
-                style={{ width: 20, height: 20 }}
-              />
-              <Text>Log In with Google</Text>
-            </View>
-          </Button>
+          <AuthGoogle />
+          <Link href="/(login)/sign-up" asChild>
+            <Text className="text-center mt-4 text-primary/60">
+              You don't have an account?{" "}
+              <Text className="text-primary">Register</Text>
+            </Text>
+          </Link>
         </View>
       </Form>
     </ScrollView>

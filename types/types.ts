@@ -3,3 +3,13 @@ export interface TokenCache {
   saveToken: (key: string, token: string) => Promise<void>;
   clearToken?: (key: string) => void;
 }
+
+export interface ClerkError {
+  errors: [
+    {
+      code: string;
+      message: string;
+      longMessage: string;
+    },
+  ];
+}
