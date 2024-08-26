@@ -97,6 +97,9 @@ export function LoginScreen() {
               />
             )}
           />
+          <Link href="/(login)/change-password" asChild>
+            <Text className="text-right text-primary">Forgot Password?</Text>
+          </Link>
           <Button className="mt-4" onPress={form.handleSubmit(onSubmit)}>
             <Text>Sign In</Text>
           </Button>
